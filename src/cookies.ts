@@ -1,4 +1,4 @@
-import { parse, serialize } from "cookie";
+import * as cookie from "cookie";
 
 import {
   DEFAULT_COOKIE_OPTIONS,
@@ -41,7 +41,7 @@ export function createStorageFromOptions(
       | CookieMethodsServerDeprecated;
     cookieOptions?: CookieOptionsWithName;
   },
-  isServerClient: boolean,
+  isServerClient: boolean
 ) {
   const cookies = options.cookies ?? null;
   const cookieEncoding = options.cookieEncoding;
@@ -103,12 +103,12 @@ export function createStorageFromOptions(
       } else if (isServerClient) {
         setAll = async () => {
           console.warn(
-            "@supabase/ssr: createServerClient was configured without set and remove cookie methods, but the client needs to set cookies. This can lead to issues such as random logouts, early session termination or increased token refresh requests. If in NextJS, check your middleware.ts file, route handlers and server actions for correctness. Consider switching to the getAll and setAll cookie methods instead of get, set and remove which are deprecated and can be difficult to use correctly.",
+            "@supabase/ssr: createServerClient was configured without set and remove cookie methods, but the client needs to set cookies. This can lead to issues such as random logouts, early session termination or increased token refresh requests. If in NextJS, check your middleware.ts file, route handlers and server actions for correctness. Consider switching to the getAll and setAll cookie methods instead of get, set and remove which are deprecated and can be difficult to use correctly."
           );
         };
       } else {
         throw new Error(
-          "@supabase/ssr: createBrowserClient requires configuring a getAll and setAll cookie method (deprecated: alternatively both get, set and remove can be used)",
+          "@supabase/ssr: createBrowserClient requires configuring a getAll and setAll cookie method (deprecated: alternatively both get, set and remove can be used)"
         );
       }
     } else if ("getAll" in cookies) {
@@ -119,25 +119,25 @@ export function createStorageFromOptions(
       } else if (isServerClient) {
         setAll = async () => {
           console.warn(
-            "@supabase/ssr: createServerClient was configured without the setAll cookie method, but the client needs to set cookies. This can lead to issues such as random logouts, early session termination or increased token refresh requests. If in NextJS, check your middleware.ts file, route handlers and server actions for correctness.",
+            "@supabase/ssr: createServerClient was configured without the setAll cookie method, but the client needs to set cookies. This can lead to issues such as random logouts, early session termination or increased token refresh requests. If in NextJS, check your middleware.ts file, route handlers and server actions for correctness."
           );
         };
       } else {
         throw new Error(
-          "@supabase/ssr: createBrowserClient requires configuring both getAll and setAll cookie methods (deprecated: alternatively both get, set and remove can be used)",
+          "@supabase/ssr: createBrowserClient requires configuring both getAll and setAll cookie methods (deprecated: alternatively both get, set and remove can be used)"
         );
       }
     } else {
       // neither get nor getAll is present on cookies, only will occur if pure JavaScript is used, but cookies is an object
       throw new Error(
-        `@supabase/ssr: ${isServerClient ? "createServerClient" : "createBrowserClient"} requires configuring getAll and setAll cookie methods (deprecated: alternatively use get, set and remove).${isBrowser() ? " As this is called in a browser runtime, consider removing the cookies option object to use the document.cookie API automatically." : ""}`,
+        `@supabase/ssr: ${isServerClient ? "createServerClient" : "createBrowserClient"} requires configuring getAll and setAll cookie methods (deprecated: alternatively use get, set and remove).${isBrowser() ? " As this is called in a browser runtime, consider removing the cookies option object to use the document.cookie API automatically." : ""}`
       );
     }
   } else if (!isServerClient && isBrowser()) {
     // The environment is browser, so use the document.cookie API to implement getAll and setAll.
 
     const noHintGetAll = () => {
-      const parsed = parse(document.cookie);
+      const parsed = cookie.parse(document.cookie);
 
       return Object.keys(parsed).map((name) => ({
         name,
@@ -149,12 +149,12 @@ export function createStorageFromOptions(
 
     setAll = (setCookies) => {
       setCookies.forEach(({ name, value, options }) => {
-        document.cookie = serialize(name, value, options);
+        document.cookie = cookie.serialize(name, value, options);
       });
     };
   } else if (isServerClient) {
     throw new Error(
-      "@supabase/ssr: createServerClient must be initialized with cookie options that specify getAll and setAll functions (deprecated, not recommended: alternatively use get, set and remove)",
+      "@supabase/ssr: createServerClient must be initialized with cookie options that specify getAll and setAll functions (deprecated, not recommended: alternatively use get, set and remove)"
     );
   } else {
     // getting cookies when there's no window but we're in browser mode can be OK, because the developer probably is not using auth functions
@@ -165,7 +165,7 @@ export function createStorageFromOptions(
     // this is NOT OK because the developer is using auth functions that require setting some state, so that must error out
     setAll = () => {
       throw new Error(
-        "@supabase/ssr: createBrowserClient in non-browser runtimes (including Next.js pre-rendering mode) was not initialized cookie options that specify getAll and setAll functions (deprecated: alternatively use get, set and remove), but they were needed",
+        "@supabase/ssr: createBrowserClient in non-browser runtimes (including Next.js pre-rendering mode) was not initialized cookie options that specify getAll and setAll functions (deprecated: alternatively use get, set and remove), but they were needed"
       );
     };
   }
@@ -196,7 +196,7 @@ export function createStorageFromOptions(
               }
 
               return cookie.value;
-            },
+            }
           );
 
           if (!chunkedCookie) {
@@ -207,7 +207,7 @@ export function createStorageFromOptions(
 
           if (chunkedCookie.startsWith(BASE64_PREFIX)) {
             decoded = stringFromBase64URL(
-              chunkedCookie.substring(BASE64_PREFIX.length),
+              chunkedCookie.substring(BASE64_PREFIX.length)
             );
           }
 
@@ -218,7 +218,7 @@ export function createStorageFromOptions(
           const cookieNames = allCookies?.map(({ name }) => name) || [];
 
           const removeCookies = new Set(
-            cookieNames.filter((name) => isChunkLike(name, key)),
+            cookieNames.filter((name) => isChunkLike(name, key))
           );
 
           let encoded = value;
@@ -270,7 +270,7 @@ export function createStorageFromOptions(
           const allCookies = await getAll([key]);
           const cookieNames = allCookies?.map(({ name }) => name) || [];
           const removeCookies = cookieNames.filter((name) =>
-            isChunkLike(name, key),
+            isChunkLike(name, key)
           );
 
           const removeCookieOptions = {
@@ -289,7 +289,7 @@ export function createStorageFromOptions(
                 name,
                 value: "",
                 options: removeCookieOptions,
-              })),
+              }))
             );
           }
         },
@@ -335,7 +335,7 @@ export function createStorageFromOptions(
             }
 
             return cookie.value;
-          },
+          }
         );
 
         if (!chunkedCookie) {
@@ -349,7 +349,7 @@ export function createStorageFromOptions(
           chunkedCookie.startsWith(BASE64_PREFIX)
         ) {
           decoded = stringFromBase64URL(
-            chunkedCookie.substring(BASE64_PREFIX.length),
+            chunkedCookie.substring(BASE64_PREFIX.length)
           );
         }
 
@@ -373,7 +373,7 @@ export function createStorageFromOptions(
             {
               cookieOptions: options?.cookieOptions ?? null,
               cookieEncoding,
-            },
+            }
           );
         }
 
@@ -413,7 +413,7 @@ export async function applyServerStorage(
   options: {
     cookieEncoding: "raw" | "base64url";
     cookieOptions?: CookieOptions | null;
-  },
+  }
 ) {
   const cookieEncoding = options.cookieEncoding;
   const cookieOptions = options.cookieOptions ?? null;
@@ -427,12 +427,12 @@ export async function applyServerStorage(
   const removeCookies: string[] = Object.keys(removedItems).flatMap(
     (itemName) => {
       return cookieNames.filter((name) => isChunkLike(name, itemName));
-    },
+    }
   );
 
   const setCookies = Object.keys(setItems).flatMap((itemName) => {
     const removeExistingCookiesForItem = new Set(
-      cookieNames.filter((name) => isChunkLike(name, itemName)),
+      cookieNames.filter((name) => isChunkLike(name, itemName))
     );
 
     let encoded = setItems[itemName];
