@@ -1,4 +1,4 @@
-import { parse, serialize } from "cookie";
+import * as cookie from "cookie";
 import { DEFAULT_COOKIE_OPTIONS, combineChunks, createChunks, isBrowser, isChunkLike, stringFromBase64URL, stringToBase64URL, } from "./utils";
 const BASE64_PREFIX = "base64-";
 /**
@@ -87,7 +87,7 @@ export function createStorageFromOptions(options, isServerClient) {
     else if (!isServerClient && isBrowser()) {
         // The environment is browser, so use the document.cookie API to implement getAll and setAll.
         const noHintGetAll = () => {
-            const parsed = parse(document.cookie);
+            const parsed = cookie.parse(document.cookie);
             return Object.keys(parsed).map((name) => ({
                 name,
                 value: parsed[name] ?? "",
@@ -96,7 +96,7 @@ export function createStorageFromOptions(options, isServerClient) {
         getAll = () => noHintGetAll();
         setAll = (setCookies) => {
             setCookies.forEach(({ name, value, options }) => {
-                document.cookie = serialize(name, value, options);
+                document.cookie = cookie.serialize(name, value, options);
             });
         };
     }
